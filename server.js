@@ -76,6 +76,25 @@ app.get('/produtos/categoria/:cat', async (req, res) => {
     }
 });
 
+// Rota para consultar apenas 1 produto pelo ID
+app.get('/produtos/:id', async (req, res) => {
+    try {
+        // req.params.id pega o ID que você digitou na URL
+        const produto = await Cosmetico.findById(req.params.id);
+
+        // Se o banco não encontrar nada com esse ID
+        if (!produto) {
+            return res.status(404).json({ erro: "Cosmético não encontrado." });
+        }
+
+        // Se encontrar, retorna o produto
+        res.json(produto);
+
+    } catch (error) {
+        // Se o ID digitado for inválido (com menos caracteres do que o MongoDB exige)
+        res.status(400).json({ erro: "ID inválido ou mal formatado." });
+    }
+});
 
 app.put('/produtos/:id', async (req, res) => {
     try {
