@@ -1,0 +1,116 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Cosméticos 💄",
+    "version": "1.0.0",
+    "description": "API profissional para gerenciamento de catálogo de cosméticos com autenticação JWT, upload de imagens no Cloudinary e controle de acessos (Roles)."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Insira o token JWT gerado no login."
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Registra um novo usuário",
+        "tags": ["Autenticação"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "usuario@teste.com" },
+                  "senha": { "type": "string", "example": "123456" },
+                  "role": { "type": "string", "enum": ["cliente", "admin"], "example": "cliente" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuário criado com sucesso" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Autentica um usuário e gera Token",
+        "tags": ["Autenticação"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "chefe@admin.com" },
+                  "senha": { "type": "string", "example": "123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Retorna o token" }
+        }
+      }
+    },
+    "/produtos": {
+      "get": {
+        "summary": "Lista produtos com paginação e filtros",
+        "tags": ["Produtos"],
+        "parameters": [
+          { "in": "query", "name": "busca", "schema": { "type": "string" } },
+          { "in": "query", "name": "categoria", "schema": { "type": "string" } },
+          { "in": "query", "name": "marca", "schema": { "type": "string" } },
+          { "in": "query", "name": "page", "schema": { "type": "integer", "default": 1 } },
+          { "in": "query", "name": "limit", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Lista de produtos" }
+        }
+      }
+    },
+    "/cadastro": {
+      "post": {
+        "summary": "Cadastra um novo produto (Admin)",
+        "tags": ["Produtos"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": { "type": "string", "example": "Batom" },
+                  "marca": { "type": "string", "example": "Natura" },
+                  "preco": { "type": "number", "example": 49.9 },
+                  "categoria": { "type": "string", "example": "Maquiagem" },
+                  "imagem": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Cadastrado" }
+        }
+      }
+    }
+  }
+}
